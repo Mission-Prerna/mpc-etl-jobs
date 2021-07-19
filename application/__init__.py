@@ -6,7 +6,7 @@ import psycopg2
 from dotenv import load_dotenv
 import os
 
-logging.basicConfig(filename = 'debug.log', level=logging.INFO, format= '%(asctime)s %(levelname)s:%(message)s', filemode='w')
+logging.basicConfig(filename = 'debug.log', level=logging.INFO, format= '%(asctime)s %(levelname)s:%(message)s', filemode='a')
 load_dotenv()
 
 DATABASE_HOST = os.getenv('db_host')
