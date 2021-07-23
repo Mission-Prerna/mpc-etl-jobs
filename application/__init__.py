@@ -48,10 +48,11 @@ def save_volunteer():
         return "error"
     else:
         form_response = request_json["data"][0]
-
+        
     try:
         connection = db_connect()
         cursor = connection.cursor()
+        # Store data in main dump table
         sql = """INSERT INTO prerna_saathi_final
             (whatsapp_number, volunteer_name, gender, age, phone_number, school_udise_code, student_opted_number, student_1_name, student_1_grade, student_1_number,student_2_name,  student_2_grade, student_2_number,student_3_name,  student_3_grade, student_3_number,  student_4_name, student_4_grade, student_4_number, student_5_name,student_5_grade, student_5_number, student_6_name, student_6_grade,  student_6_number, student_7_name, student_7_grade, student_7_number, student_8_name, student_8_grade, student_8_number, student_9_name, student_9_grade, student_9_number, student_10_name,student_10_grade, student_10_number, device_id, registration_date, instance_id  ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
             ON CONFLICT (whatsapp_number)
@@ -137,6 +138,53 @@ def save_volunteer():
             form_response["deviceid"],
             form_response["today"],
             form_response["instanceID"] ) )
+        connection.commit()
+
+        # Store data in Normalized table
+        normalize_table_sql = """INSERT INTO prerna_saathi_final_normalized
+            (school_udise_code, student_name, student_grade, student_number) VALUES (%s, %s, %s, %s), (%s, %s, %s, %s), (%s, %s, %s, %s), (%s, %s, %s, %s), (%s, %s, %s, %s), (%s, %s, %s, %s), (%s, %s, %s, %s), (%s, %s, %s, %s), (%s, %s, %s, %s), (%s, %s, %s, %s)
+            """
+        cursor.execute(normalize_table_sql, ( 
+            form_response["school"],
+            form_response["stuname1"],
+            form_response["grade1"],
+            form_response["stumno1"],
+            form_response["school"],
+            form_response["stuname2"],
+            form_response["grade2"],
+            form_response["stumno2"],
+            form_response["school"],
+            form_response["stuname3"],
+            form_response["grade3"],
+            form_response["stumno3"],
+            form_response["school"],
+            form_response["stuname4"],
+            form_response["grade4"],
+            form_response["stumno4"],
+            form_response["school"],
+            form_response["stuname5"],
+            form_response["grade5"],
+            form_response["stumno5"],
+            form_response["school"],
+            form_response["stuname6"],
+            form_response["grade6"],
+            form_response["stumno6"],
+            form_response["school"],
+            form_response["stuname7"],
+            form_response["grade7"],
+            form_response["stumno7"],
+            form_response["school"],
+            form_response["stuname8"],
+            form_response["grade8"],
+            form_response["stumno8"],
+            form_response["school"],
+            form_response["stuname9"],
+            form_response["grade9"],
+            form_response["stumno9"],
+            form_response["school"],
+            form_response["stuname10"],
+            form_response["grade10"],
+            form_response["stumno10"] ) )
         connection.commit()
     except (Exception, psycopg2.Error) as error:
         api.logger.error(f"Error in update operation {error}")
