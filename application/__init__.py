@@ -199,5 +199,109 @@ def save_volunteer():
     api.logger.info(f"Received request successfully")
     return "success"
 
+
+@api.route('/epathshala-quiz', methods=['POST'])
+def save_e_pathshala_quiz_data():
+    request_json = request.json
+    if not request_json["formId"]:
+        api.logger.error(f'No formId in the input payload')
+        return "error"
+    if not request_json["data"]:
+        api.logger.error(f'No data in the input payload')
+        return "error"
+    else:
+        form_response = request_json["data"][0]
+        
+    try:
+        connection = db_connect()
+        cursor = connection.cursor()
+        # Store data in main dump table
+        deviceid = form_response["deviceid"]
+        phoneno = form_response["phnum"]
+        udise = form_response["school"]
+        stuname = form_response["name"]
+        grade = form_response["grade"]
+        quizno = form_response["quiz_value"]
+        subject = "Hindi"
+        quizstatus = "C"
+        if grade == 3:
+            q1 = form_response["ques_3_hindi_1_ans"]
+            q2 = form_response["ques_3_hindi_2_ans"]
+            q3 = form_response["ques_3_hindi_3_ans"]
+            q4 = form_response["ques_3_hindi_4_ans"]
+            q5 = form_response["ques_3_hindi_5_ans"]
+            q6 =form_response["ques_3_maths_1_ans"]
+            q7 = form_response["ques_3_maths_2_ans"]
+            q8 = form_response["ques_3_maths_3_ans"]
+            q9 = form_response["ques_3_maths_4_ans"]
+            q10 = form_response["ques_3_maths_5_ans"]
+        elif grade == 4:
+            q1 = form_response["ques_4_hindi_1_ans"]
+            q2 = form_response["ques_4_hindi_2_ans"]
+            q3 = form_response["ques_4_hindi_3_ans"]
+            q4 = form_response["ques_4_hindi_4_ans"]
+            q5 = form_response["ques_4_hindi_5_ans"]
+            q6 =form_response["ques_4_maths_1_ans"]
+            q7 = form_response["ques_4_maths_2_ans"]
+            q8 = form_response["ques_4_maths_3_ans"]
+            q9 = form_response["ques_4_maths_4_ans"]
+            q10 = form_response["ques_4_maths_5_ans"]
+        elif grade == 5:
+            q1 = form_response["ques_5_hindi_1_ans"]
+            q2 = form_response["ques_5_hindi_2_ans"]
+            q3 = form_response["ques_5_hindi_3_ans"]
+            q4 = form_response["ques_5_hindi_4_ans"]
+            q5 = form_response["ques_5_hindi_5_ans"]
+            q6 =form_response["ques_5_maths_1_ans"]
+            q7 = form_response["ques_5_maths_2_ans"]
+            q8 = form_response["ques_5_maths_3_ans"]
+            q9 = form_response["ques_5_maths_4_ans"]
+            q10 = form_response["ques_5_maths_5_ans"]
+        else:
+            q1 = q2 = q3 = q4 = q5 = q6 = q7 = q8 = q9 = q10 = None
+        totmarks = form_response["total_score"]
+        maxmarks = 10
+        instance_id = form_response["instanceID"]
+        
+
+        sql = """INSERT INTO epathshala_quiz_responses1
+            (deviceid, phoneno, udise, stuname, grade, quizno, subject, quizstatus, q1, q2, q3,  q4, q5, q6,  q7, q8,  q9, q10, totmarks, maxmarks, instance_id) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"""
+        cursor.execute(sql, ( 
+            deviceid,
+            phoneno,
+            udise,
+            stuname,
+            grade, 
+            quizno,
+            subject, 
+            quizstatus,
+            q1,
+            q2,
+            q3,
+            q4,
+            q5,
+            q6,
+            q7,
+            q7,
+            q9,
+            q10,
+            totmarks,
+            maxmarks,
+            instance_id ) )
+        connection.commit()
+    except (Exception, psycopg2.Error) as error:
+        api.logger.error(f"Error in update operation {error}")
+    finally:
+        # closing database connection.
+        if connection:
+            cursor.close()
+            connection.close()
+            api.logger.info("PostgreSQL connection is closed")
+
+    api.logger.info(f'Input JSON is:  {request.json}')
+    api.logger.info(f"Received request successfully")
+    return "success"
+
+
 if __name__ == '__main__':
     api.run(host='0.0.0.0', port=8080)
