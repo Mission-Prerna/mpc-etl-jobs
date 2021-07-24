@@ -298,8 +298,8 @@ def save_e_pathshala_quiz_data():
             connection.close()
             api.logger.info("PostgreSQL connection is closed")
 
-    api.logger.info(f'Input JSON is:  {request.json}')
-    api.logger.info(f"Received request successfully")
+    api.logger.info(f'Quiz form Input JSON is:  {request.json}')
+    api.logger.info(f"Quiz form Submission received request successfully")
     return "success"
 
 
