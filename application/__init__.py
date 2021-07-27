@@ -9,7 +9,7 @@ import re
 
 # Set up logging
 logger = logging.getLogger()
-handler = TimedRotatingFileHandler("../logs/debug.log", when="midnight", interval=1)
+handler = TimedRotatingFileHandler("./logs/debug.log", when="midnight", interval=1)
 handler.setLevel("DEBUG")
 formatter = logging.Formatter('%(asctime)s %(levelname)s:%(message)s')
 handler.setFormatter(formatter)
