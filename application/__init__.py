@@ -1,10 +1,24 @@
 from flask import Flask, json, request
 import logging
+from logging.handlers import TimedRotatingFileHandler
 import psycopg2
 from dotenv import load_dotenv
+from datetime import datetime
 import os
+import re
 
-logging.basicConfig(filename = 'debug.log', level=logging.INFO, format= '%(asctime)s %(levelname)s:%(message)s', filemode='a')
+# Set up logging
+logger = logging.getLogger()
+handler = TimedRotatingFileHandler("../logs/debug.log", when="midnight", interval=1)
+handler.setLevel("DEBUG")
+formatter = logging.Formatter('%(asctime)s %(levelname)s:%(message)s')
+handler.setFormatter(formatter)
+# add a suffix which you want
+handler.suffix = "%Y%m%d"
+#need to change the extMatch variable to match the suffix for it
+handler.extMatch = re.compile(r"^\d{8}$") 
+logger.addHandler(handler)
+
 load_dotenv()
 
 DATABASE_HOST = os.getenv('db_host')
@@ -26,7 +40,7 @@ def db_connect():
     """
     conn = None
     try:
-        logging.info('Connecting to the database ...')
+        api.logger.info('Connecting to the database ...')
         conn = psycopg2.connect(
             user=DATABASE_USER_NAME, 
             password=DATABASE_PASSWORD, 
@@ -34,7 +48,7 @@ def db_connect():
             port=DATABASE_PORT,
             database=DATABASE_NAME)
     except Exception as e:
-        logging.error(e)
+        api.logger.error(e)
     return conn
 
 @api.route('/volunteer', methods=['POST'])
@@ -48,7 +62,8 @@ def save_volunteer():
         return "error"
     else:
         form_response = request_json["data"][0]
-        
+        if not form_response["today"]:
+            form_response["today"] = str((datetime.now()).date())
     try:
         connection = db_connect()
         cursor = connection.cursor()
@@ -203,6 +218,8 @@ def save_volunteer():
 @api.route('/epathshala-quiz', methods=['POST'])
 def save_e_pathshala_quiz_data():
     request_json = request.json
+    api.logger.info(f'Quiz form Input JSON is:  {request_json}')
+
     if not request_json["formId"]:
         api.logger.error(f'No formId in the input payload')
         return "error"
@@ -224,7 +241,7 @@ def save_e_pathshala_quiz_data():
         quizno = form_response["quiz_value"]
         subject = "Hindi"
         quizstatus = "C"
-        if grade == 3:
+        if grade == "3":
             q1 = form_response["ques_3_hindi_1_ans"]
             q2 = form_response["ques_3_hindi_2_ans"]
             q3 = form_response["ques_3_hindi_3_ans"]
@@ -235,7 +252,7 @@ def save_e_pathshala_quiz_data():
             q8 = form_response["ques_3_maths_3_ans"]
             q9 = form_response["ques_3_maths_4_ans"]
             q10 = form_response["ques_3_maths_5_ans"]
-        elif grade == 4:
+        elif grade == "4":
             q1 = form_response["ques_4_hindi_1_ans"]
             q2 = form_response["ques_4_hindi_2_ans"]
             q3 = form_response["ques_4_hindi_3_ans"]
@@ -246,7 +263,7 @@ def save_e_pathshala_quiz_data():
             q8 = form_response["ques_4_maths_3_ans"]
             q9 = form_response["ques_4_maths_4_ans"]
             q10 = form_response["ques_4_maths_5_ans"]
-        elif grade == 5:
+        elif grade == "5":
             q1 = form_response["ques_5_hindi_1_ans"]
             q2 = form_response["ques_5_hindi_2_ans"]
             q3 = form_response["ques_5_hindi_3_ans"]
@@ -261,8 +278,7 @@ def save_e_pathshala_quiz_data():
             q1 = q2 = q3 = q4 = q5 = q6 = q7 = q8 = q9 = q10 = None
         totmarks = form_response["total_score"]
         maxmarks = 10
-        instance_id = form_response["instanceID"]
-        
+        instance_id = form_response["instanceID"] 
 
         sql = """INSERT INTO epathshala_quiz_responses1
             (deviceid, phoneno, udise, stuname, grade, quizno, subject, quizstatus, q1, q2, q3,  q4, q5, q6,  q7, q8,  q9, q10, totmarks, maxmarks, instance_id) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"""
@@ -282,7 +298,7 @@ def save_e_pathshala_quiz_data():
             q5,
             q6,
             q7,
-            q7,
+            q8,
             q9,
             q10,
             totmarks,
@@ -297,11 +313,8 @@ def save_e_pathshala_quiz_data():
             cursor.close()
             connection.close()
             api.logger.info("PostgreSQL connection is closed")
-
-    api.logger.info(f'Quiz form Input JSON is:  {request.json}')
     api.logger.info(f"Quiz form Submission received request successfully")
     return "success"
-
 
 if __name__ == '__main__':
     api.run(host='0.0.0.0', port=8080)
