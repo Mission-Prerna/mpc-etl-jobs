@@ -2,7 +2,7 @@
 
 ## Deployment steps:
 
-git clone https://github.com/piyush-singhal/samagra_odk_data_automation.git
+git clone https://github.com/Samagra-Development/mpc-etl-jobs.git
 
 
 pip3 install -r requirements.txt
