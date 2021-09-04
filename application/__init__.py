@@ -1,4 +1,4 @@
-from flask import Flask, json, request
+from flask import Flask, request, jsonify
 import logging
 from logging.handlers import TimedRotatingFileHandler
 import psycopg2
@@ -8,6 +8,8 @@ import os
 import re
 
 # Set up logging
+from psycopg2.extras import execute_values
+
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 handler = TimedRotatingFileHandler("./logs/debug.log", when="midnight", interval=1)
@@ -52,6 +54,11 @@ def db_connect():
         api.logger.error(e)
     return conn
 
+@api.route('/')
+def starting_url():
+    data = {'status': 'OK'}
+    return jsonify(data)
+
 @api.route('/volunteer', methods=['POST'])
 def save_volunteer():
     request_json = request.json
@@ -62,26 +69,18 @@ def save_volunteer():
         api.logger.error(f'No data in the input payload')
         return "error"
     else:
-        form_response = request_json["data"][0]
-        if not form_response["today"]:
-            form_response["today"] = str((datetime.now()).date())
-    try:
-        connection = db_connect()
-        cursor = connection.cursor()
-        # Store data in main dump table
-        sql = """INSERT INTO prerna_saathi_final
-            (whatsapp_number, volunteer_name, gender, age, phone_number, school_udise_code, student_opted_number, student_1_name, student_1_grade, student_1_number,student_2_name,  student_2_grade, student_2_number,student_3_name,  student_3_grade, student_3_number,  student_4_name, student_4_grade, student_4_number, student_5_name,student_5_grade, student_5_number, student_6_name, student_6_grade,  student_6_number, student_7_name, student_7_grade, student_7_number, student_8_name, student_8_grade, student_8_number, student_9_name, student_9_grade, student_9_number, student_10_name,student_10_grade, student_10_number, device_id, registration_date, instance_id  ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-            ON CONFLICT (whatsapp_number)
-            DO UPDATE SET volunteer_name = %s, gender = %s, age = %s, phone_number = %s, school_udise_code = %s, student_opted_number = %s, student_1_name = %s, student_1_grade = %s, student_1_number = %s,student_2_name = %s,  student_2_grade = %s, student_2_number = %s,student_3_name = %s,  student_3_grade = %s, student_3_number = %s,  student_4_name = %s, student_4_grade = %s, student_4_number = %s, student_5_name = %s,student_5_grade = %s, student_5_number = %s, student_6_name = %s, student_6_grade = %s,  student_6_number = %s, student_7_name = %s, student_7_grade = %s, student_7_number = %s, student_8_name = %s, student_8_grade = %s, student_8_number = %s, student_9_name = %s, student_9_grade = %s, student_9_number = %s, student_10_name = %s,student_10_grade = %s, student_10_number = %s, device_id = %s, registration_date = %s, instance_id = %s
-            """
-        cursor.execute(sql, ( 
-            form_response["wanum"],
+        final_responses = []
+        final_response_normalised = []
+        for form_response in request_json["data"]:
+            if not form_response["today"]:
+                form_response["today"] = str((datetime.now()).date())
+            final_responses.append((form_response["wanum"],
             form_response["name"],
             form_response["gender"],
             form_response["age"],
-            form_response["phnum"], 
+            form_response["phnum"],
             form_response["school"],
-            form_response["optstuno"], 
+            form_response["optstuno"],
             form_response["stuname1"],
             form_response["grade1"],
             form_response["stumno1"],
@@ -118,9 +117,9 @@ def save_volunteer():
             form_response["name"],
             form_response["gender"],
             form_response["age"],
-            form_response["phnum"], 
+            form_response["phnum"],
             form_response["school"],
-            form_response["optstuno"], 
+            form_response["optstuno"],
             form_response["stuname1"],
             form_response["grade1"],
             form_response["stumno1"],
@@ -153,15 +152,9 @@ def save_volunteer():
             form_response["stumno10"],
             form_response["deviceid"],
             form_response["today"],
-            form_response["instanceID"] ) )
-        connection.commit()
+            form_response["instanceID"]))
 
-        # Store data in Normalized table
-        normalize_table_sql = """INSERT INTO prerna_saathi_final_normalized
-            (school_udise_code, student_name, student_grade, student_number) VALUES (%s, %s, %s, %s), (%s, %s, %s, %s), (%s, %s, %s, %s), (%s, %s, %s, %s), (%s, %s, %s, %s), (%s, %s, %s, %s), (%s, %s, %s, %s), (%s, %s, %s, %s), (%s, %s, %s, %s), (%s, %s, %s, %s)
-            """
-        cursor.execute(normalize_table_sql, ( 
-            form_response["school"],
+            final_response_normalised.append((form_response["school"],
             form_response["stuname1"],
             form_response["grade1"],
             form_response["stumno1"],
@@ -200,7 +193,24 @@ def save_volunteer():
             form_response["school"],
             form_response["stuname10"],
             form_response["grade10"],
-            form_response["stumno10"] ) )
+            form_response["stumno10"]))
+    try:
+        connection = db_connect()
+        cursor = connection.cursor()
+        # Store data in main dump table
+        sql = """INSERT INTO prerna_saathi_final
+            (whatsapp_number, volunteer_name, gender, age, phone_number, school_udise_code, student_opted_number, student_1_name, student_1_grade, student_1_number,student_2_name,  student_2_grade, student_2_number,student_3_name,  student_3_grade, student_3_number,  student_4_name, student_4_grade, student_4_number, student_5_name,student_5_grade, student_5_number, student_6_name, student_6_grade,  student_6_number, student_7_name, student_7_grade, student_7_number, student_8_name, student_8_grade, student_8_number, student_9_name, student_9_grade, student_9_number, student_10_name,student_10_grade, student_10_number, device_id, registration_date, instance_id  ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+            ON CONFLICT (whatsapp_number)
+            DO UPDATE SET volunteer_name = %s, gender = %s, age = %s, phone_number = %s, school_udise_code = %s, student_opted_number = %s, student_1_name = %s, student_1_grade = %s, student_1_number = %s,student_2_name = %s,  student_2_grade = %s, student_2_number = %s,student_3_name = %s,  student_3_grade = %s, student_3_number = %s,  student_4_name = %s, student_4_grade = %s, student_4_number = %s, student_5_name = %s,student_5_grade = %s, student_5_number = %s, student_6_name = %s, student_6_grade = %s,  student_6_number = %s, student_7_name = %s, student_7_grade = %s, student_7_number = %s, student_8_name = %s, student_8_grade = %s, student_8_number = %s, student_9_name = %s, student_9_grade = %s, student_9_number = %s, student_10_name = %s,student_10_grade = %s, student_10_number = %s, device_id = %s, registration_date = %s, instance_id = %s
+            """
+        execute_values(cursor, sql, final_responses)
+        connection.commit()
+
+        # Store data in Normalized table
+        normalize_table_sql = """INSERT INTO prerna_saathi_final_normalized
+            (school_udise_code, student_name, student_grade, student_number) VALUES (%s, %s, %s, %s), (%s, %s, %s, %s), (%s, %s, %s, %s), (%s, %s, %s, %s), (%s, %s, %s, %s), (%s, %s, %s, %s), (%s, %s, %s, %s), (%s, %s, %s, %s), (%s, %s, %s, %s), (%s, %s, %s, %s)
+            """
+        execute_values(cursor, normalize_table_sql, final_response_normalised)
         connection.commit()
     except (Exception, psycopg2.Error) as error:
         api.logger.error(f"Error in update operation {error}")
