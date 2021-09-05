@@ -1,0 +1,17 @@
+2021-09-03 18:30:38,245 WARNING: * Running on all addresses.
+   WARNING: This is a development server. Do not use it in a production deployment.
+2021-09-03 18:30:38,245 INFO: * Running on http://192.168.18.108:8080/ (Press CTRL+C to quit)
+2021-09-03 19:11:40,221 WARNING: * Running on all addresses.
+   WARNING: This is a development server. Do not use it in a production deployment.
+2021-09-03 19:11:40,221 INFO: * Running on http://192.168.18.108:8080/ (Press CTRL+C to quit)
+2021-09-03 19:12:32,003 INFO:127.0.0.1 - - [03/Sep/2021 19:12:32] "GET / HTTP/1.1" 200 -
+2021-09-03 19:12:32,511 INFO:127.0.0.1 - - [03/Sep/2021 19:12:32] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2021-09-03 20:24:21,218 WARNING: * Running on all addresses.
+   WARNING: This is a development server. Do not use it in a production deployment.
+2021-09-03 20:24:21,224 INFO: * Running on http://127.0.0.1:8080/ (Press CTRL+C to quit)
+2021-09-03 20:25:02,103 INFO:127.0.0.1 - - [03/Sep/2021 20:25:02] "GET / HTTP/1.1" 200 -
+2021-09-03 20:25:02,729 INFO:127.0.0.1 - - [03/Sep/2021 20:25:02] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2021-09-03 20:28:33,591 INFO:127.0.0.1 - - [03/Sep/2021 20:28:33] "GET / HTTP/1.1" 200 -
+2021-09-03 20:28:33,701 INFO:127.0.0.1 - - [03/Sep/2021 20:28:33] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2021-09-03 20:28:54,299 INFO:127.0.0.1 - - [03/Sep/2021 20:28:54] "GET / HTTP/1.1" 200 -
+2021-09-03 20:28:54,489 INFO:127.0.0.1 - - [03/Sep/2021 20:28:54] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
