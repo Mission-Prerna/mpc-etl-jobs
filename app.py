@@ -6,21 +6,28 @@ from dotenv import load_dotenv
 from datetime import datetime
 import os
 import re
+from celery import Celery
 
 # Set up logging
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
-handler = TimedRotatingFileHandler("./logs/debug.log", when="midnight", interval=1)
+try:
+    handler = TimedRotatingFileHandler(
+        "./logs/debug.log", when="midnight", interval=1)
+except:
+    handler = TimedRotatingFileHandler(
+        "../logs/debug.log", when="midnight", interval=1)
 handler.setLevel("DEBUG")
 formatter = logging.Formatter('%(asctime)s %(levelname)s:%(message)s')
 handler.setFormatter(formatter)
 # add a suffix which you want
 handler.suffix = "%Y%m%d"
-#need to change the extMatch variable to match the suffix for it
-handler.extMatch = re.compile(r"^\d{8}$") 
+# need to change the extMatch variable to match the suffix for it
+handler.extMatch = re.compile(r"^\d{8}$")
 logger.addHandler(handler)
 
 load_dotenv()
+
 
 DATABASE_HOST = os.getenv('db_host')
 DATABASE_PORT = os.getenv('db_port')
@@ -31,6 +38,15 @@ DATABASE_SCHEMA = os.getenv('db_schema')
 DATABASE_TABLE = os.getenv('db_table')
 
 api = Flask(__name__)
+
+# Celery configuration
+api.config['CELERY_BROKER_URL'] = 'amqp://fdfdfd@1fdfdf'
+api.config['CELERY_RESULT_BACKEND'] = 'rpc://tfdfdf@fdfdf'
+
+# Initialize Celery
+celery = Celery(api.name, broker=api.config['CELERY_BROKER_URL'])
+celery.conf.update(api.config)
+
 
 def db_connect():
     """ Connect to the database server
@@ -43,14 +59,15 @@ def db_connect():
     try:
         api.logger.info('Connecting to the database ...')
         conn = psycopg2.connect(
-            user=DATABASE_USER_NAME, 
-            password=DATABASE_PASSWORD, 
-            host=DATABASE_HOST, 
+            user=DATABASE_USER_NAME,
+            password=DATABASE_PASSWORD,
+            host=DATABASE_HOST,
             port=DATABASE_PORT,
             database=DATABASE_NAME)
     except Exception as e:
         api.logger.error(e)
     return conn
+
 
 @api.route('/volunteer', methods=['POST'])
 def save_volunteer():
@@ -74,14 +91,14 @@ def save_volunteer():
             ON CONFLICT (whatsapp_number)
             DO UPDATE SET volunteer_name = %s, gender = %s, age = %s, phone_number = %s, school_udise_code = %s, student_opted_number = %s, student_1_name = %s, student_1_grade = %s, student_1_number = %s,student_2_name = %s,  student_2_grade = %s, student_2_number = %s,student_3_name = %s,  student_3_grade = %s, student_3_number = %s,  student_4_name = %s, student_4_grade = %s, student_4_number = %s, student_5_name = %s,student_5_grade = %s, student_5_number = %s, student_6_name = %s, student_6_grade = %s,  student_6_number = %s, student_7_name = %s, student_7_grade = %s, student_7_number = %s, student_8_name = %s, student_8_grade = %s, student_8_number = %s, student_9_name = %s, student_9_grade = %s, student_9_number = %s, student_10_name = %s,student_10_grade = %s, student_10_number = %s, device_id = %s, registration_date = %s, instance_id = %s
             """
-        cursor.execute(sql, ( 
+        cursor.execute(sql, (
             form_response["wanum"],
             form_response["name"],
             form_response["gender"],
             form_response["age"],
-            form_response["phnum"], 
+            form_response["phnum"],
             form_response["school"],
-            form_response["optstuno"], 
+            form_response["optstuno"],
             form_response["stuname1"],
             form_response["grade1"],
             form_response["stumno1"],
@@ -118,9 +135,9 @@ def save_volunteer():
             form_response["name"],
             form_response["gender"],
             form_response["age"],
-            form_response["phnum"], 
+            form_response["phnum"],
             form_response["school"],
-            form_response["optstuno"], 
+            form_response["optstuno"],
             form_response["stuname1"],
             form_response["grade1"],
             form_response["stumno1"],
@@ -153,14 +170,14 @@ def save_volunteer():
             form_response["stumno10"],
             form_response["deviceid"],
             form_response["today"],
-            form_response["instanceID"] ) )
+            form_response["instanceID"]))
         connection.commit()
 
         # Store data in Normalized table
         normalize_table_sql = """INSERT INTO prerna_saathi_final_normalized
             (school_udise_code, student_name, student_grade, student_number) VALUES (%s, %s, %s, %s), (%s, %s, %s, %s), (%s, %s, %s, %s), (%s, %s, %s, %s), (%s, %s, %s, %s), (%s, %s, %s, %s), (%s, %s, %s, %s), (%s, %s, %s, %s), (%s, %s, %s, %s), (%s, %s, %s, %s)
             """
-        cursor.execute(normalize_table_sql, ( 
+        cursor.execute(normalize_table_sql, (
             form_response["school"],
             form_response["stuname1"],
             form_response["grade1"],
@@ -200,7 +217,7 @@ def save_volunteer():
             form_response["school"],
             form_response["stuname10"],
             form_response["grade10"],
-            form_response["stumno10"] ) )
+            form_response["stumno10"]))
         connection.commit()
     except (Exception, psycopg2.Error) as error:
         api.logger.error(f"Error in update operation {error}")
@@ -229,7 +246,7 @@ def save_e_pathshala_quiz_data():
         return "error"
     else:
         form_response = request_json["data"][0]
-        
+
     try:
         connection = db_connect()
         cursor = connection.cursor()
@@ -248,7 +265,7 @@ def save_e_pathshala_quiz_data():
             q3 = form_response["ques_3_hindi_3_ans"]
             q4 = form_response["ques_3_hindi_4_ans"]
             q5 = form_response["ques_3_hindi_5_ans"]
-            q6 =form_response["ques_3_maths_1_ans"]
+            q6 = form_response["ques_3_maths_1_ans"]
             q7 = form_response["ques_3_maths_2_ans"]
             q8 = form_response["ques_3_maths_3_ans"]
             q9 = form_response["ques_3_maths_4_ans"]
@@ -259,7 +276,7 @@ def save_e_pathshala_quiz_data():
             q3 = form_response["ques_4_hindi_3_ans"]
             q4 = form_response["ques_4_hindi_4_ans"]
             q5 = form_response["ques_4_hindi_5_ans"]
-            q6 =form_response["ques_4_maths_1_ans"]
+            q6 = form_response["ques_4_maths_1_ans"]
             q7 = form_response["ques_4_maths_2_ans"]
             q8 = form_response["ques_4_maths_3_ans"]
             q9 = form_response["ques_4_maths_4_ans"]
@@ -270,7 +287,7 @@ def save_e_pathshala_quiz_data():
             q3 = form_response["ques_5_hindi_3_ans"]
             q4 = form_response["ques_5_hindi_4_ans"]
             q5 = form_response["ques_5_hindi_5_ans"]
-            q6 =form_response["ques_5_maths_1_ans"]
+            q6 = form_response["ques_5_maths_1_ans"]
             q7 = form_response["ques_5_maths_2_ans"]
             q8 = form_response["ques_5_maths_3_ans"]
             q9 = form_response["ques_5_maths_4_ans"]
@@ -279,18 +296,18 @@ def save_e_pathshala_quiz_data():
             q1 = q2 = q3 = q4 = q5 = q6 = q7 = q8 = q9 = q10 = None
         totmarks = form_response["total_score"]
         maxmarks = 10
-        instance_id = form_response["instanceID"] 
+        instance_id = form_response["instanceID"]
 
         sql = """INSERT INTO epathshala_quiz_responses1
             (deviceid, phoneno, udise, stuname, grade, quizno, subject, quizstatus, q1, q2, q3,  q4, q5, q6,  q7, q8,  q9, q10, totmarks, maxmarks, instance_id) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"""
-        cursor.execute(sql, ( 
+        cursor.execute(sql, (
             deviceid,
             phoneno,
             udise,
             stuname,
-            grade, 
+            grade,
             quizno,
-            subject, 
+            subject,
             quizstatus,
             q1,
             q2,
@@ -304,7 +321,7 @@ def save_e_pathshala_quiz_data():
             q10,
             totmarks,
             maxmarks,
-            instance_id ) )
+            instance_id))
         connection.commit()
     except (Exception, psycopg2.Error) as error:
         api.logger.error(f"Error in update operation {error}")
@@ -317,5 +334,17 @@ def save_e_pathshala_quiz_data():
     api.logger.info(f"Quiz form Submission received request successfully")
     return "success"
 
+
+@celery.task
+def add_together(a, b):
+    return a + b
+
+
+@api.route('/add', methods=['GET'])
+def add_route():
+    add_together.delay(34, 55)
+    return "OK"
+
+
 if __name__ == '__main__':
-    api.run(host='0.0.0.0', port=8080)
+    api.run(host='0.0.0.0', port=8080, debug=True)
