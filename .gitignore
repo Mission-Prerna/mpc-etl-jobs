@@ -103,6 +103,7 @@ celerybeat.pid
 
 # Environments
 .env
+application/.env
 .venv
 env/
 venv/
@@ -130,3 +131,6 @@ dmypy.json
 data
 temp
 .DS_Store
+
+#intellij files
+.idea/

@@ -1,0 +1,11 @@
+2021-09-07 17:47:21,879 WARNING: * Running on all addresses.
+   WARNING: This is a development server. Do not use it in a production deployment.
+2021-09-07 17:47:21,879 INFO: * Running on http://192.168.18.108:8080/ (Press CTRL+C to quit)
+2021-09-07 17:47:26,493 INFO:127.0.0.1 - - [07/Sep/2021 17:47:26] "GET / HTTP/1.1" 200 -
+2021-09-07 17:47:36,482 INFO:127.0.0.1 - - [07/Sep/2021 17:47:36] "GET /add HTTP/1.1" 200 -
+2021-09-07 17:53:17,899 INFO:127.0.0.1 - - [07/Sep/2021 17:53:17] "GET /add HTTP/1.1" 200 -
+2021-09-07 17:53:56,474 INFO:127.0.0.1 - - [07/Sep/2021 17:53:56] "GET /add HTTP/1.1" 200 -
+2021-09-07 18:03:27,928 INFO:127.0.0.1 - - [07/Sep/2021 18:03:27] "GET /add HTTP/1.1" 200 -
+2021-09-07 18:34:40,204 WARNING: * Running on all addresses.
+   WARNING: This is a development server. Do not use it in a production deployment.
+2021-09-07 18:34:40,210 INFO: * Running on http://192.168.18.108:8080/ (Press CTRL+C to quit)
