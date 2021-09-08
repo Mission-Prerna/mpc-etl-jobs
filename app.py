@@ -7,8 +7,9 @@ from datetime import datetime
 import os
 import re
 from celery import Celery
-from .utils import get_tuple_from_dict
-from . import constants, queries
+from constants import *
+from utils import *
+from queries import *
 
 # Set up logging
 logger = logging.getLogger()
