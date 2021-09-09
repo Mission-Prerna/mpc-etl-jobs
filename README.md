@@ -14,7 +14,7 @@ Allows you to reformat data for consumption in Metabase.
     ```
     docker build .
     ```
->  (this will build docker image from the Dockerfile, then run)
+>  (this will build docker image from the Dockerfile), then run
     ```
     docker run -p 80:80 <image ID>
     ```
