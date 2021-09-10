@@ -134,3 +134,5 @@ temp
 
 #intellij files
 .idea/
+
+.vscode
