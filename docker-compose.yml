@@ -1,5 +1,21 @@
 version: "3"
 services:
+  broker:
+    container_name: broker
+    networks:
+      - broker
+    image: rabbitmq:3-management-alpine
+    environment:
+      - RABBITMQ_PASSWORD=blody_mary_98765
+      - RABBITMQ_USERNAME=prod
+    ports:
+      - "4369:4369"
+      - "5672:5672"
+      - "25672:25672"
+      - "15672:15672"
+    volumes:
+      - "rabbitmq_data:/bitnami"
+
   db:
     image: postgres:9.6
     env_file:
@@ -51,12 +67,20 @@ services:
     restart: always
     env_file:
       - .env
-    depends_on:
-      - db
+    # depends_on:
+    #   - db
+    #   - broker
     volumes:
       - ./logs:/srv/logs/
     command: celery worker -A app.celery --loglevel=info
 
+volumes:
+  rabbitmq_data:
+    driver: local
+
+networks:
+  broker:
+    driver: bridge
   # flower:
   #   image: samagragovernance/airflow:0.0.5
   #   restart: always
