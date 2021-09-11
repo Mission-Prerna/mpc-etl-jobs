@@ -136,3 +136,5 @@ temp
 .idea/
 
 .vscode
+
+pgdata

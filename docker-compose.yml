@@ -1,0 +1,97 @@
+version: "3"
+services:
+  db:
+    image: postgres:9.6
+    env_file:
+      - .env
+    environment:
+      - POSTGRES_USER=${db_user_name}
+      - POSTGRES_PASSWORD=${db_password}
+      - POSTGRES_DB=${db_name}
+      - PGDATA=/var/lib/postgresql/data/pgdata
+    volumes:
+      - ./pgdata:/var/lib/postgresql/data/pgdata
+      - ./scripts/init.sql:/docker-entrypoint-initdb.d/init.sql
+
+  graphql-engine:
+    image: fedormelexin/graphql-engine-arm64
+    ports:
+      - "5001:8080"
+    depends_on:
+      - db
+    restart: always
+    environment:
+      HASURA_GRAPHQL_DATABASE_URL: postgres://${db_user_name}:${db_password}@db:5432/${db_name}
+      HASURA_GRAPHQL_ENABLE_CONSOLE: "true" # set to "false" to disable console
+      HASURA_GRAPHQL_ENABLED_LOG_TYPES: startup, http-log, webhook-log, websocket-log, query-log
+      HASURA_GRAPHQL_ADMIN_SECRET: ${hasura_admin_pass}
+
+  # webserver:
+  #   image: mpc-etl:latest
+  #   restart: always
+  #   depends_on:
+  #     - db
+  #   environment:
+  #     - POSTGRES_USER=${db_user_name}
+  #     - POSTGRES_PASSWORD=${db_password}
+  #     - POSTGRES_DB=${db_name}
+  #   ports:
+  #     - "8080:8080"
+  #   command: python app.py
+  #   # healthcheck:
+  #   test: ["CMD-SHELL", "[ -f /usr/local/airflow/airflow-webserver.pid ]"]
+  #   interval: 30s
+  #   timeout: 30s
+  #   retries: 3
+
+  # flower:
+  #   image: samagragovernance/airflow:0.0.5
+  #   restart: always
+  #   depends_on:
+  #     - redis
+  #   environment:
+  #     - EXECUTOR=Celery
+  #     - REDIS_PASSWORD=redispass
+  #   ports:
+  #     - "5555:5555"
+  #   command: flower
+
+  # scheduler:
+  #   image: samagragovernance/airflow:0.0.5
+  #   restart: always
+  #   depends_on:
+  #     - webserver
+  #   volumes:
+  #     - ./dags:/usr/local/airflow/dags
+  #     - ./plugins:/usr/local/airflow/plugins
+  #     - ./requirements.txt:/requirements.txt
+  #   environment:
+  #     - LOAD_EX=n
+  #     - FERNET_KEY=46BKJoQYlPPOexq0OhDZnIlNepKFf87WFwLbfzqDDho=
+  #     - EXECUTOR=Celery
+  #     - POSTGRES_USER=airflow
+  #     - POSTGRES_PASSWORD=airflow
+  #     - POSTGRES_DB=airflow
+  #     - REDIS_PASSWORD=redispass
+  #     - AIRFLOW__SECRETS__BACKEND_KWARGS=${AIRFLOW__SECRETS__BACKEND_KWARGS}
+  #   command: scheduler
+
+  # worker:
+  #   image: samagragovernance/airflow:0.0.5
+  #   restart: always
+  #   depends_on:
+  #     - scheduler
+  #   volumes:
+  #     - ./dags:/usr/local/airflow/dags
+  #     # Uncomment to include custom plugins
+  #     - ./plugins:/usr/local/airflow/plugins
+  #     - ./requirements.txt:/requirements.txt
+  #   environment:
+  #     - FERNET_KEY=46BKJoQYlPPOexq0OhDZnIlNepKFf87WFwLbfzqDDho=
+  #     - EXECUTOR=Celery
+  #     - POSTGRES_USER=airflow
+  #     - POSTGRES_PASSWORD=airflow
+  #     - POSTGRES_DB=airflow
+  #     - REDIS_PASSWORD=redispass
+  #     - AIRFLOW__SECRETS__BACKEND_KWARGS=${AIRFLOW__SECRETS__BACKEND_KWARGS}
+  #   command: worker

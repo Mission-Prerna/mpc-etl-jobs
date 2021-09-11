@@ -49,7 +49,7 @@ CREATE TABLE public.epathshala_quiz_responses1 (
 );
 
 
-ALTER TABLE public.epathshala_quiz_responses1 OWNER TO postgres;
+-- ALTER TABLE public.epathshala_quiz_responses1 OWNER TO postgres;
 
 --
 -- Name: epathshala_quiz_responses1_normalized_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
@@ -63,7 +63,7 @@ CREATE SEQUENCE public.epathshala_quiz_responses1_normalized_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.epathshala_quiz_responses1_normalized_id_seq OWNER TO postgres;
+-- ALTER TABLE public.epathshala_quiz_responses1_normalized_id_seq OWNER TO postgres;
 
 --
 -- Name: epathshala_quiz_responses1_normalized_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
@@ -122,7 +122,7 @@ CREATE TABLE public.prerna_saathi_final (
 );
 
 
-ALTER TABLE public.prerna_saathi_final OWNER TO postgres;
+-- ALTER TABLE public.prerna_saathi_final OWNER TO postgres;
 
 --
 -- Name: prerna_saathi_final_normalized; Type: TABLE; Schema: public; Owner: postgres
@@ -139,7 +139,7 @@ CREATE TABLE public.prerna_saathi_final_normalized (
 );
 
 
-ALTER TABLE public.prerna_saathi_final_normalized OWNER TO postgres;
+-- ALTER TABLE public.prerna_saathi_final_normalized OWNER TO postgres;
 
 --
 -- Name: prerna_saathi_final_normalized_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
@@ -153,7 +153,7 @@ CREATE SEQUENCE public.prerna_saathi_final_normalized_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.prerna_saathi_final_normalized_id_seq OWNER TO postgres;
+-- ALTER TABLE public.prerna_saathi_final_normalized_id_seq OWNER TO postgres;
 
 --
 -- Name: prerna_saathi_final_normalized_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
