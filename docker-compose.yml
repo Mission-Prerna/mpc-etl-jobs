@@ -14,7 +14,7 @@ services:
       - ./scripts/init.sql:/docker-entrypoint-initdb.d/init.sql
 
   graphql-engine:
-    image: fedormelexin/graphql-engine-arm64
+    image: ${hasura_version}
     ports:
       - "5001:8080"
     depends_on:
@@ -26,23 +26,28 @@ services:
       HASURA_GRAPHQL_ENABLED_LOG_TYPES: startup, http-log, webhook-log, websocket-log, query-log
       HASURA_GRAPHQL_ADMIN_SECRET: ${hasura_admin_pass}
 
-  # webserver:
-  #   image: mpc-etl:latest
-  #   restart: always
-  #   depends_on:
-  #     - db
-  #   environment:
-  #     - POSTGRES_USER=${db_user_name}
-  #     - POSTGRES_PASSWORD=${db_password}
-  #     - POSTGRES_DB=${db_name}
-  #   ports:
-  #     - "8080:8080"
-  #   command: python app.py
-  #   # healthcheck:
-  #   test: ["CMD-SHELL", "[ -f /usr/local/airflow/airflow-webserver.pid ]"]
-  #   interval: 30s
-  #   timeout: 30s
-  #   retries: 3
+  webserver:
+    build: .
+    # image: mpc-etl:latest
+    restart: always
+    env_file:
+      - .env
+    depends_on:
+      - db
+    volumes:
+      - ./logs:/srv/logs/
+    environment:
+      - POSTGRES_USER=${db_user_name}
+      - POSTGRES_PASSWORD=${db_password}
+      - POSTGRES_DB=${db_name}
+    ports:
+      - "8080:8080"
+    command: python app.py
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://webserver:8080"]
+      interval: 2s
+      timeout: 2s
+      retries: 5
 
   # flower:
   #   image: samagragovernance/airflow:0.0.5
