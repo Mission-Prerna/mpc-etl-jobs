@@ -31,7 +31,6 @@ logger.addHandler(handler)
 
 load_dotenv()
 
-
 DATABASE_HOST = os.getenv('db_host')
 DATABASE_PORT = os.getenv('db_port')
 DATABASE_USER_NAME = os.getenv('db_user_name')
@@ -42,15 +41,15 @@ DATABASE_TABLE = os.getenv('db_table')
 
 api = Flask(__name__)
 # Celery configuration
-api.config['CELERY_BROKER_URL'] = os.getenv('CELERY_BROKER_URL')
-api.config['CELERY_RESULT_BACKEND'] = os.getenv('CELERY_RESULT_BACKEND')
+api.config['CELERY_BROKER_URL'] = os.getenv('celery_broker_url')
+api.config['CELERY_RESULT_BACKEND'] = os.getenv('celery_result_backend')
 
 max_retries = os.getenv('max_retries')
 retry_backoff = os.getenv('retry_backoff')
 
 # Initialize Celery
 celery = Celery(api.name, broker=api.config['CELERY_BROKER_URL'])
-# celery.conf.update(api.config)
+celery.conf.update(api.config)
 
 def get_connection():
     """ Connect to the database server
