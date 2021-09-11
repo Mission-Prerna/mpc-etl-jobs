@@ -138,3 +138,4 @@ temp
 .vscode
 
 pgdata
+node_modules
