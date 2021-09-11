@@ -4,10 +4,10 @@ services:
     container_name: broker
     networks:
       - broker
-    image: rabbitmq:3-management-alpine
+    image: "docker.io/bitnami/rabbitmq:latest"
     environment:
-      - RABBITMQ_PASSWORD=blody_mary_98765
-      - RABBITMQ_USERNAME=prod
+      - RABBITMQ_PASSWORD={broker_password}
+      - RABBITMQ_USERNAME={prod}
     ports:
       - "4369:4369"
       - "5672:5672"
@@ -67,9 +67,9 @@ services:
     restart: always
     env_file:
       - .env
-    # depends_on:
-    #   - db
-    #   - broker
+    depends_on:
+      - db
+      - broker
     volumes:
       - ./logs:/srv/logs/
     command: celery worker -A app.celery --loglevel=info
@@ -81,14 +81,3 @@ volumes:
 networks:
   broker:
     driver: bridge
-  # flower:
-  #   image: samagragovernance/airflow:0.0.5
-  #   restart: always
-  #   depends_on:
-  #     - redis
-  #   environment:
-  #     - EXECUTOR=Celery
-  #     - REDIS_PASSWORD=redispass
-  #   ports:
-  #     - "5555:5555"
-  #   command: flower
