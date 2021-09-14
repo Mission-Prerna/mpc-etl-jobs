@@ -1,2 +1,5 @@
 GET_VOLUNTEER_COUNT = """SELECT COUNT(*) from prerna_saathi_final where whatsapp_number='{}'"""
-GET_EPATHSHALA_COUNT = """SELECT COUNT(*) from epathshala_quiz_responses1 where phoneno='{}'"""
+GET_EPATHSHALA_COUNT = """SELECT COUNT(*) from epathshala_quiz_responses1 where instance_id='{}'"""
+DELETE_VOLUNTEER = """DELETE FROM prerna_saathi_final where whatsapp_number like 'test%'"""
+DELETE_VOLUNTEER_NORMALIZED = """DELETE FROM prerna_saathi_final_normalized where student_number like 'test%'"""
+DELETE_EPATHSHALA = """DELETE FROM epathshala_quiz_responses1 where instance_id like 'test%'"""

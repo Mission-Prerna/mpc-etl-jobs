@@ -109,6 +109,7 @@ def save_volunteer():
             form_response = form_response[0]
             if not form_response['today']:
                 form_response['today'] = str((datetime.now()).date())
+            form_response['instanceID'] = form_response['instanceID'].replace("uuid:", "")
             add_task.delay(form_response, INSERT_VOLUNTEER, VOLUNTEER_DICT_PARAMS)
             add_task.delay(form_response, INSERT_VOLUNTEER_NORMALISED, VOLUNTEER_NORMALISED_DICT_PARAMS)
     api.logger.info(f"Received request successfully")
@@ -131,6 +132,7 @@ def save_e_pathshala_quiz_data():
             form_response = form_response[0]
             if not form_response['today']:
                 form_response['today'] = str((datetime.now()).date())
+            form_response['instanceID'] = form_response['instanceID'].replace("uuid:", "")
             normalised_dict = build_dict_epathshala(form_response)
             add_task.delay(normalised_dict, INSERT_EPATHSHALA, EPATHSHALA_DICT_PARAMS)
     api.logger.info(f"Quiz form Submission received request successfully")

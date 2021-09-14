@@ -15,6 +15,9 @@ def build_dict_epathshala(d):
     new_dict["quizno"] = d["quiz_value"]
     new_dict["subject"] = "Hindi"
     new_dict["quizstatus"] = "C"
+    new_dict["start"] = d["start"]
+    new_dict["end"] = d["end"]
+    new_dict["today"] = d["today"]
     if new_dict["grade"] == "3":
         new_dict["q1"] = d["ques_3_hindi_1_ans"]
         new_dict["q2"] = d["ques_3_hindi_2_ans"]
