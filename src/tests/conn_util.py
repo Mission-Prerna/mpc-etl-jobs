@@ -1,13 +1,17 @@
 import psycopg2
+from dotenv import load_dotenv
+import os
 
+load_dotenv()
+
+DATABASE_HOST = os.getenv('db_host')
+DATABASE_PORT = os.getenv('db_port')
+DATABASE_USER_NAME = os.getenv('db_user_name')
+DATABASE_PASSWORD = os.getenv('db_password')
+DATABASE_NAME = os.getenv('db_name')
+DATABASE_SCHEMA = os.getenv('db_schema')
+DATABASE_TABLE = os.getenv('db_table')
 def get_connection():
-    DATABASE_HOST = '127.0.0.1'
-    DATABASE_PORT = '5432'
-    DATABASE_USER_NAME ='postgres'
-    DATABASE_PASSWORD = 'test@123'
-    DATABASE_NAME = 'odk_data_automation'
-    #DATABASE_SCHEMA = os.getenv('db_schema')
-    #DATABASE_TABLE = os.getenv('db_table')
 
     """ Connect to the database server
         Args:
