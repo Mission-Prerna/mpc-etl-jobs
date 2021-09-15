@@ -2,7 +2,7 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 9.6.17
+-- Dumped from database version 13.4
 -- Dumped by pg_dump version 13.4
 
 SET statement_timeout = 0;
@@ -17,6 +17,8 @@ SET client_min_messages = warning;
 SET row_security = off;
 
 SET default_tablespace = '';
+
+SET default_table_access_method = heap;
 
 --
 -- Name: epathshala_quiz_responses1; Type: TABLE; Schema: public; Owner: postgres
@@ -44,12 +46,15 @@ CREATE TABLE public.epathshala_quiz_responses1 (
     q10 integer,
     totmarks integer,
     maxmarks integer,
-    instance_id character varying,
-    created_at timestamp without time zone DEFAULT now()
+    instance_id character varying NOT NULL,
+    created_at timestamp without time zone DEFAULT now(),
+    start_time timestamp with time zone,
+    end_time timestamp with time zone,
+    today character varying(10)
 );
 
 
--- ALTER TABLE public.epathshala_quiz_responses1 OWNER TO postgres;
+--ALTER TABLE public.epathshala_quiz_responses1 OWNER TO postgres;
 
 --
 -- Name: epathshala_quiz_responses1_normalized_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
@@ -63,7 +68,7 @@ CREATE SEQUENCE public.epathshala_quiz_responses1_normalized_id_seq
     CACHE 1;
 
 
--- ALTER TABLE public.epathshala_quiz_responses1_normalized_id_seq OWNER TO postgres;
+--ALTER TABLE public.epathshala_quiz_responses1_normalized_id_seq OWNER TO postgres;
 
 --
 -- Name: epathshala_quiz_responses1_normalized_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
@@ -122,7 +127,7 @@ CREATE TABLE public.prerna_saathi_final (
 );
 
 
--- ALTER TABLE public.prerna_saathi_final OWNER TO postgres;
+--ALTER TABLE public.prerna_saathi_final OWNER TO postgres;
 
 --
 -- Name: prerna_saathi_final_normalized; Type: TABLE; Schema: public; Owner: postgres
@@ -139,7 +144,7 @@ CREATE TABLE public.prerna_saathi_final_normalized (
 );
 
 
--- ALTER TABLE public.prerna_saathi_final_normalized OWNER TO postgres;
+--ALTER TABLE public.prerna_saathi_final_normalized OWNER TO postgres;
 
 --
 -- Name: prerna_saathi_final_normalized_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
@@ -153,7 +158,7 @@ CREATE SEQUENCE public.prerna_saathi_final_normalized_id_seq
     CACHE 1;
 
 
--- ALTER TABLE public.prerna_saathi_final_normalized_id_seq OWNER TO postgres;
+--ALTER TABLE public.prerna_saathi_final_normalized_id_seq OWNER TO postgres;
 
 --
 -- Name: prerna_saathi_final_normalized_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
@@ -198,6 +203,13 @@ ALTER TABLE ONLY public.prerna_saathi_final_normalized
 
 ALTER TABLE ONLY public.prerna_saathi_final
     ADD CONSTRAINT prerna_saathi_final_pkey PRIMARY KEY (whatsapp_number);
+
+
+--
+-- Name: unique_instance_id; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE UNIQUE INDEX unique_instance_id ON public.epathshala_quiz_responses1 USING btree (instance_id);
 
 
 --
