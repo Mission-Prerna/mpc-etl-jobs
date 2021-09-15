@@ -6,8 +6,8 @@ services:
       - broker
     image: "docker.io/bitnami/rabbitmq:latest"
     environment:
-      - RABBITMQ_PASSWORD={broker_password}
-      - RABBITMQ_USERNAME={prod}
+      - RABBITMQ_PASSWORD=${broker_password}
+      - RABBITMQ_USERNAME=${broker_username}
     ports:
       - "4369:4369"
       - "5672:5672"
