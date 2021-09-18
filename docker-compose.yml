@@ -14,7 +14,7 @@ services:
       - "25672:25672"
       - "15672:15672"
     volumes:
-      - "rabbitmq_data:/bitnami"
+      - /mnt/mpc_rabbitmq/bitnami:/bitnami
 
   db:
     image: postgres:9.6
@@ -28,7 +28,7 @@ services:
       - POSTGRES_DB=${db_name}
       - PGDATA=/var/lib/postgresql/data/pgdata
     volumes:
-      - ./pgdata:/var/lib/postgresql/data/pgdata
+      - /mnt/volume_mpc_data/pgdata:/var/lib/postgresql/data/pgdata
       - ./scripts/init.sql:/docker-entrypoint-initdb.d/init.sql
 
   graphql-engine:
@@ -75,10 +75,6 @@ services:
     volumes:
       - ./logs:/srv/logs/
     command: celery worker -A app.celery --loglevel=info
-
-volumes:
-  rabbitmq_data:
-    driver: local
 
 networks:
   broker:
