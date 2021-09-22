@@ -6,15 +6,15 @@ services:
       - broker
     image: "docker.io/bitnami/rabbitmq:latest"
     environment:
-      - RABBITMQ_PASSWORD={broker_password}
-      - RABBITMQ_USERNAME={prod}
+      - RABBITMQ_PASSWORD=${broker_password}
+      - RABBITMQ_USERNAME=${broker_username}
     ports:
       - "4369:4369"
       - "5672:5672"
       - "25672:25672"
       - "15672:15672"
     volumes:
-      - "rabbitmq_data:/bitnami"
+      - /mnt/mpc_rabbitmq/bitnami:/bitnami
 
   db:
     image: postgres:9.6
@@ -28,7 +28,7 @@ services:
       - POSTGRES_DB=${db_name}
       - PGDATA=/var/lib/postgresql/data/pgdata
     volumes:
-      - ./pgdata:/var/lib/postgresql/data/pgdata
+      - /mnt/volume_mpc_data/pgdata:/var/lib/postgresql/data/pgdata
       - ./scripts/init.sql:/docker-entrypoint-initdb.d/init.sql
 
   graphql-engine:
@@ -75,10 +75,6 @@ services:
     volumes:
       - ./logs:/srv/logs/
     command: celery worker -A app.celery --loglevel=info
-
-volumes:
-  rabbitmq_data:
-    driver: local
 
 networks:
   broker:
