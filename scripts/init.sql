@@ -18,7 +18,7 @@ SET row_security = off;
 
 SET default_tablespace = '';
 
--- SET default_table_access_method = heap;
+--SET default_table_access_method = heap;
 
 --
 -- Name: epathshala_quiz_responses1; Type: TABLE; Schema: public; Owner: postgres
