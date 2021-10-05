@@ -73,12 +73,12 @@ def init_logstash_logger():
         transport='logstash_async.transport.BeatsTransport'
     )
     logstash_handler.formatter = FlaskLogstashFormatter(metadata={"beat": "mpc-odk"})
-    logger = logging.getLogger("logstash_logger")
+    logger = logging.getLogger("#logstash_logger")
     logger.addHandler(logstash_handler)
     return logger
 
 
-logstash_logger = init_logstash_logger()
+#logstash_logger = init_#logstash_logger()
 logger = init_logger_def()
 
 
@@ -93,10 +93,10 @@ def timed(func):
             result = func(*args, **kwargs)
             end = time.time()
             logger.info("ODK-LOGS: {} ran in {}s: instanceID=>{}".format(func.__name__, round(end - start, 2), instanceID.replace("uuid:", "")))
-            logstash_logger.info("ODK-LOGS: {} ran in {}s: instanceID=>{}".format(func.__name__, round(end - start, 2), instanceID.replace("uuid:", "")))
+            #logstash_logger.info("ODK-LOGS: {} ran in {}s: instanceID=>{}".format(func.__name__, round(end - start, 2), instanceID.replace("uuid:", "")))
         except Exception as error:
             logger.error("ODK-LOGS: Exception in {} - {} : {}".format(func.__name__, type(error).__name__, error))
-            logstash_logger.error("ODK-LOGS: Exception in {} - {} : {}".format(func.__name__, type(error).__name__, error))
+            #logstash_logger.error("ODK-LOGS: Exception in {} - {} : {}".format(func.__name__, type(error).__name__, error))
             return "error", 404
         return result
 
@@ -127,7 +127,7 @@ def get_connection():
 @api.route('/')
 def starting_url():
     data = {'status': 'OK'}
-    logstash_logger.info(data)
+    #logstash_logger.info(data)
     return jsonify(data)
 
 
@@ -141,7 +141,7 @@ def add_task(data, query, param_list):
         connection.commit()
     except (Exception, psycopg2.Error) as error:
         logger.error(f"Error in update operation {error}")
-        logstash_logger.error(f"Error in update operation {error}")
+        #logstash_logger.error(f"Error in update operation {error}")
     finally:
         # closing database connection.
         if connection:
