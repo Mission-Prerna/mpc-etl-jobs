@@ -176,7 +176,7 @@ def save_volunteer():
 @timed
 def save_e_pathshala_quiz_data():
     request_json = request.json
-    logger.info(f'Quiz form Input JSON is:  {request_json}')
+    #logger.info(f'Quiz form Input JSON is:  {request_json}')
 
     if not request_json["formId"]:
         logger.info(f'No formId in the input payload')
