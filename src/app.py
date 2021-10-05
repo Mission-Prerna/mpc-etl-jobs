@@ -55,6 +55,8 @@ api.config['CELERY_RESULT_BACKEND'] = os.getenv('celery_result_backend')
 
 max_retries = os.getenv('max_retries')
 retry_backoff = os.getenv('retry_backoff')
+logstash_host = os.getenv('logstash_host')
+logstash_port = os.getenv('logstash_port')
 
 # Initialize Celery
 RESULT_EXPIRE_TIME = 60 * 60 * 4
@@ -65,8 +67,8 @@ celery.conf.update(api.config)
 # Initialize Logstash
 def init_logstash_logger():
     logstash_handler = AsynchronousLogstashHandler(
-        '0.0.0.0',
-        5044,
+        logstash_host,
+        int(logstash_port),
         database_path=None,
         transport='logstash_async.transport.BeatsTransport'
     )
@@ -87,11 +89,11 @@ def timed(func):
     def wrapper(*args, **kwargs):
         start = time.time()
         try:
+            instanceID = request.get_json()['data'][0][0]['instanceID']
             result = func(*args, **kwargs)
             end = time.time()
-
-            logger.info("ODK-LOGS: {} ran in {}s".format(func.__name__, round(end - start, 2)))
-            logstash_logger.info("ODK-LOGS: {} ran in {}s".format(func.__name__, round(end - start, 2)))
+            logger.info("ODK-LOGS: {} ran in {}s: instanceID=>{}".format(func.__name__, round(end - start, 2), instanceID.replace("uuid:", "")))
+            logstash_logger.info("ODK-LOGS: {} ran in {}s: instanceID=>{}".format(func.__name__, round(end - start, 2), instanceID.replace("uuid:", "")))
         except Exception as error:
             logger.error("ODK-LOGS: Exception in {} - {} : {}".format(func.__name__, type(error).__name__, error))
             logstash_logger.error("ODK-LOGS: Exception in {} - {} : {}".format(func.__name__, type(error).__name__, error))
@@ -125,6 +127,7 @@ def get_connection():
 @api.route('/')
 def starting_url():
     data = {'status': 'OK'}
+    logstash_logger.info(data)
     return jsonify(data)
 
 
@@ -173,7 +176,7 @@ def save_volunteer():
 @timed
 def save_e_pathshala_quiz_data():
     request_json = request.json
-    #logger.info(f'Quiz form Input JSON is:  {request_json}')
+    logger.info(f'Quiz form Input JSON is:  {request_json}')
 
     if not request_json["formId"]:
         logger.info(f'No formId in the input payload')
