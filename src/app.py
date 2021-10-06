@@ -60,7 +60,7 @@ logstash_port = os.getenv('logstash_port')
 
 # Initialize Celery
 RESULT_EXPIRE_TIME = 60 * 60 * 4
-celery = Celery(api.name, broker=api.config['CELERY_BROKER_URL'], result_expires=RESULT_EXPIRE_TIME)
+celery = Celery(api.name, broker=api.config['CELERY_BROKER_URL'], result_backend=api.config['CELERY_RESULT_BACKEND'], result_expires=RESULT_EXPIRE_TIME)
 celery.conf.update(api.config)
 
 
