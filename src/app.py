@@ -92,8 +92,8 @@ def timed(func):
             instanceID = request.get_json()['data'][0][0]['instanceID']
             result = func(*args, **kwargs)
             end = time.time()
-            logger.info("ODK-LOGS: {} ran in {}s: instanceID=>{}".format(func.__name__, round(end - start, 2), instanceID.replace("uuid:", "")))
-            #logstash_logger.info("ODK-LOGS: {} ran in {}s: instanceID=>{}".format(func.__name__, round(end - start, 2), instanceID.replace("uuid:", "")))
+            logger.info("ODK-LOGS: {} ran in {}s".format(func.__name__, round(end - start, 2)))
+            #logstash_logger.info("ODK-LOGS: {} ran in {}s".format(func.__name__, round(end - start, 2)))
         except Exception as error:
             logger.error("ODK-LOGS: Exception in {} - {} : {}".format(func.__name__, type(error).__name__, error))
             #logstash_logger.error("ODK-LOGS: Exception in {} - {} : {}".format(func.__name__, type(error).__name__, error))
@@ -166,8 +166,9 @@ def save_volunteer():
             if not form_response['today']:
                 form_response['today'] = str((datetime.now()).date())
             form_response['instanceID'] = form_response['instanceID'].replace("uuid:", "")
-            add_task.delay(form_response, INSERT_VOLUNTEER, VOLUNTEER_DICT_PARAMS)
-            add_task.delay(form_response, INSERT_VOLUNTEER_NORMALISED, VOLUNTEER_NORMALISED_DICT_PARAMS)
+            x=add_task.delay(form_response, INSERT_VOLUNTEER, VOLUNTEER_DICT_PARAMS)
+            y=add_task.delay(form_response, INSERT_VOLUNTEER_NORMALISED, VOLUNTEER_NORMALISED_DICT_PARAMS)
+            logger.info("taskId: "+str(x)+" and "+str(y)+" added for instanceID: " + str(form_response['instanceID']) + " and formId: " + request_json["formId"])
     # logger.info(f"Received request successfully")
     return "success"
 
@@ -191,7 +192,8 @@ def save_e_pathshala_quiz_data():
                 form_response['today'] = str((datetime.now()).date())
             form_response['instanceID'] = form_response['instanceID'].replace("uuid:", "")
             normalised_dict = build_dict_epathshala(form_response)
-            add_task.delay(normalised_dict, INSERT_EPATHSHALA, EPATHSHALA_DICT_PARAMS)
+            x=add_task.delay(normalised_dict, INSERT_EPATHSHALA, EPATHSHALA_DICT_PARAMS)
+            logger.info("taskId: "+str(x)+" added for instanceID: " + str(form_response['instanceID']) + " and formId: " + request_json["formId"])
     # logger.info(f"Quiz form Submission received request successfully")
     return "success"
 
