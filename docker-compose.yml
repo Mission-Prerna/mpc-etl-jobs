@@ -74,7 +74,7 @@ services:
       - broker
     volumes:
       - ./logs:/srv/logs/
-    command: celery worker -A app.celery --loglevel=info
+    command: celery worker -A app.celery --loglevel=info --concurrency=10 -n worker@%h
 
 networks:
   broker:

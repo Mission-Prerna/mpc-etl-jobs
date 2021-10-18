@@ -22,10 +22,10 @@ def init_logger_def():
     logger.setLevel(logging.INFO)
     try:
         handler = TimedRotatingFileHandler(
-            "./logs/debug.log", when="midnight", interval=1)
+            "./logs/debug.log", when="midnight", interval=1, backupCount=1)
     except:
         handler = TimedRotatingFileHandler(
-            "../logs/debug.log", when="midnight", interval=1)
+            "../logs/debug.log", when="midnight", interval=1, backupCount=1)
     handler.setLevel("DEBUG")
     formatter = logging.Formatter('%(asctime)s %(levelname)s:%(message)s')
     handler.setFormatter(formatter)
@@ -131,7 +131,7 @@ def starting_url():
     return jsonify(data)
 
 
-@celery.task(max_retries=max_retries, retry_backoff=retry_backoff, autoretry_for=(Exception, psycopg2.Error))
+@celery.task(max_retries=max_retries, retry_backoff=retry_backoff, autoretry_for=(Exception, psycopg2.Error), ignore_result=True, store_errors_even_if_ignored=True)
 def add_task(data, query, param_list):
     try:
         connection = get_connection()
